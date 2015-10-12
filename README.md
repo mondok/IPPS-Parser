@@ -1,4 +1,4 @@
-# IppsParser
+# IPPS Parser
 
 Elixir library for parsing data from the [Inpatient Prospective Payment System (IPPS) Provider Summary](https://data.cms.gov/Medicare/Inpatient-Prospective-Payment-System-IPPS-Provider/97k6-zzx3).
 
