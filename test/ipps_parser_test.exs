@@ -15,5 +15,6 @@ defmodule IppsParserTest do
   test "can analyze json", %{json: json} do
     content = IppsParser.parse_json(json)
     result = IppsParser.analyze_key_counts(content, 1)
+    assert result != nil
   end
 end
