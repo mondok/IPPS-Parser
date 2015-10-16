@@ -1,6 +1,15 @@
 defmodule IppsParser do
 
   @doc """
+  Helper method for analyzing the key count of a given key from
+  the live IPPS payload.  
+  """
+  def analyze_key_for_ipps(key_index) do
+    json = read_payment_json
+    analyze_key_counts(json, key_index)
+  end
+
+  @doc """
   Reads the IPPS json from a url or the default
   Returns the content of the 'data' element
   """
@@ -45,7 +54,7 @@ defmodule IppsParser do
   Extracts a key and the count of times it occurs
   """
   def extract_counts(key_arr, groups) do
-    Enum.map(key_arr, fn key ->
+    pmap(key_arr, fn key ->
       {:ok, k} = Map.fetch(groups, key)
       {key, Enum.count(k)}
     end)
@@ -58,6 +67,21 @@ defmodule IppsParser do
     {_, count1} = obj1
     {_, count2} = obj2
     count1 > count2
+  end
+
+  @doc """
+  Run a map in parallel
+  """
+  def pmap(collection, function) do
+    me = self
+    collection
+    |>
+    Enum.map(fn (elem) ->
+      spawn_link fn -> (send me, { self, function.(elem) }) end
+    end) |>
+    Enum.map(fn (pid) ->
+      receive do { ^pid, result } -> result end
+    end)
   end
 
 end
