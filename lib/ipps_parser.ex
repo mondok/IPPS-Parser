@@ -1,32 +1,14 @@
 defmodule IppsParser do
+  @moduledoc """
+  IppsParser parses JSON from the Inpatient Prospective Payment System API
+  and provides the ability to analyze and group based on a key in the JSON
+  """
 
   @doc """
   Helper method for analyzing the key count of a given key from
-  the live IPPS payload.  
+  the live IPPS payload.
   """
-  def analyze_key_for_ipps(key_index) do
-    json = read_payment_json
-    analyze_key_counts(json, key_index)
-  end
-
-  @doc """
-  Reads the IPPS json from a url or the default
-  Returns the content of the 'data' element
-  """
-  def read_payment_json(url \\ "https://data.cms.gov/api/views/97k6-zzx3/rows.json") do
-    HTTPotion.start
-    content = HTTPotion.get(url, [timeout: 60_000])
-    parse_json(content.body)
-  end
-
-  @doc """
-  Parses IPPS json
-  Returns the content of 'data'
-  """
-  def parse_json(json_body) do
-    {:ok, payload} = JSX.decode(json_body)
-    payload["data"]
-  end
+  def analyze_key_for_ipps(key_index), do: analyze_key_counts(payment_json, key_index)
 
   @doc """
   Analyzes the 'data' payload and determines how many items exist for a given key
@@ -43,9 +25,28 @@ defmodule IppsParser do
   end
 
   @doc """
+  Reads the IPPS json from a url or the default
+  Returns the content of the 'data' element
+  """
+  def payment_json(url \\ "https://data.cms.gov/api/views/97k6-zzx3/rows.json") do
+    HTTPotion.start
+    content = HTTPotion.get(url, [timeout: 60_000])
+    parse_json(content.body)
+  end
+
+  @doc """
+  Parses IPPS json
+  Returns the content of 'data'
+  """
+  def parse_json(json_body) do
+    {:ok, payload} = JSX.decode(json_body)
+    payload["data"]
+  end
+
+  @doc """
   Groups the results of arr_item by the specified key index
   """
-  def group_results(arr_item, key_index) do
+  defp group_results(arr_item, key_index) do
     {:ok, group} = Enum.fetch(arr_item, key_index)
     group
   end
@@ -53,7 +54,7 @@ defmodule IppsParser do
   @doc """
   Extracts a key and the count of times it occurs
   """
-  def extract_counts(key_arr, groups) do
+  defp extract_counts(key_arr, groups) when is_list(key_arr) do
     pmap(key_arr, fn key ->
       {:ok, k} = Map.fetch(groups, key)
       {key, Enum.count(k)}
