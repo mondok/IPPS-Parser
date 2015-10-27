@@ -10,7 +10,7 @@ use Mix.Config
 
 # You can configure for your application as:
 #
-#     config :ipps_parser, key: :value
+    config :ipps_parser, ipps_url: "https://data.cms.gov/api/views/97k6-zzx3/rows.json"
 #
 # And access this configuration in your application as:
 #
@@ -18,7 +18,7 @@ use Mix.Config
 #
 # Or configure a 3rd-party app:
 #
-#     config :logger, level: :info
+    config :logger, level: :info
 #
 
 # It is also possible to import configuration files, relative to this

@@ -17,4 +17,10 @@ defmodule IppsParserTest do
     result = IppsParser.analyze_key_counts(content, 1)
     assert result != nil
   end
+
+  test "can retrieve ipps url" do
+    url = "https://data.cms.gov/api/views/97k6-zzx3/rows.json"
+    config_url = Application.get_env(:ipps_parser, :ipps_url)
+    assert url == config_url
+  end
 end

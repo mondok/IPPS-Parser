@@ -28,7 +28,7 @@ defmodule IppsParser do
   Reads the IPPS json from a url or the default
   Returns the content of the 'data' element
   """
-  def payment_json(url \\ "https://data.cms.gov/api/views/97k6-zzx3/rows.json") do
+  def payment_json(url \\ Application.get_env(:ipps_parser, :ipps_url)) do
     HTTPotion.start
     content = HTTPotion.get(url, [timeout: 60_000])
     parse_json(content.body)
@@ -67,17 +67,11 @@ defmodule IppsParser do
     end)
   end
 
-  @doc """
-  Groups the results of arr_item by the specified key index
-  """
   defp _group_results(arr_item, key_index) do
     {:ok, group} = Enum.fetch(arr_item, key_index)
     group
   end
 
-  @doc """
-  Extracts a key and the count of times it occurs
-  """
   defp _extract_counts(key_arr, groups) when is_list(key_arr) do
     pmap(key_arr, fn key ->
       {:ok, k} = Map.fetch(groups, key)
