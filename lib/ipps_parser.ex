@@ -16,10 +16,10 @@ defmodule IppsParser do
   """
   def analyze_key_counts(payload, key_index) do
     groups = Enum.group_by(payload,
-                &(group_results(&1, key_index)))
+                &(_group_results(&1, key_index)))
 
     result = Map.keys(groups)
-                |> extract_counts(groups)
+                |> _extract_counts(groups)
 
     Enum.sort(result, &(sorter(&1, &2)))
   end
@@ -44,24 +44,6 @@ defmodule IppsParser do
   end
 
   @doc """
-  Groups the results of arr_item by the specified key index
-  """
-  defp group_results(arr_item, key_index) do
-    {:ok, group} = Enum.fetch(arr_item, key_index)
-    group
-  end
-
-  @doc """
-  Extracts a key and the count of times it occurs
-  """
-  defp extract_counts(key_arr, groups) when is_list(key_arr) do
-    pmap(key_arr, fn key ->
-      {:ok, k} = Map.fetch(groups, key)
-      {key, Enum.count(k)}
-    end)
-  end
-
-  @doc """
   Sorts the objects {key, count} based on the count
   """
   def sorter(obj1, obj2) do
@@ -82,6 +64,24 @@ defmodule IppsParser do
     end) |>
     Enum.map(fn (pid) ->
       receive do { ^pid, result } -> result end
+    end)
+  end
+
+  @doc """
+  Groups the results of arr_item by the specified key index
+  """
+  defp _group_results(arr_item, key_index) do
+    {:ok, group} = Enum.fetch(arr_item, key_index)
+    group
+  end
+
+  @doc """
+  Extracts a key and the count of times it occurs
+  """
+  defp _extract_counts(key_arr, groups) when is_list(key_arr) do
+    pmap(key_arr, fn key ->
+      {:ok, k} = Map.fetch(groups, key)
+      {key, Enum.count(k)}
     end)
   end
 
